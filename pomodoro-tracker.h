@@ -17,8 +17,8 @@ public:
     void finish();
     
     std::shared_ptr<PomodoroSession> getCurrent() const { return current; }
-    int getCount() const { return count; }
-    bool isActive() const { return current != nullptr && current->isRunning(); }
+    int getCount() const {return count; }
+    bool isActive() const {return current != nullptr && current->isRunning();}
 };
 
 #endif
