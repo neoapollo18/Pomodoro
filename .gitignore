@@ -1,0 +1,19 @@
+# Compiled object files
+*.o
+
+# Executable
+pomodoro
+
+# Data file
+pomodoro_data.txt
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+
