@@ -1,80 +1,25 @@
 #include "pomodoro-tracker.h"
-#include <iostream>
 
-PomodoroTracker::PomodoroTracker(int work, int shortBreak, int longBreak)
-    : currentSession(nullptr), workSessionsCompleted(0), totalWorkMinutes(0),
-      workDuration(work), shortBreakDuration(shortBreak), longBreakDuration(longBreak) {}
+PomodoroTracker::PomodoroTracker() : current(nullptr), count(0) {}
 
-void PomodoroTracker::startWorkSession(const std::string& taskName) {
-    if (hasActiveSession()) {
-        std::cout << "Please complete or cancel the current session first.\n";
-        return;
-    }
+void PomodoroTracker::startWork(const std::string& task) {
+    if (isActive()) return;
     
-    currentSession = std::make_shared<PomodoroSession>(
-        PomodoroSession::SessionType::WORK,
-        workDuration,
-        taskName
-    );
-    currentSession->start();
-    sessions.push_back(currentSession);
+    current = std::make_shared<PomodoroSession>(PomodoroSession::SessionType::WORK, 25);
+    current->setTask(task);
+    current->start();
 }
 
-void PomodoroTracker::startBreak(bool isLongBreak) {
-    if (hasActiveSession()) {
-        std::cout << "Please complete or cancel the current session first.\n";
-        return;
-    }
+void PomodoroTracker::startBreak() {
+    if (isActive()) return;
     
-    PomodoroSession::SessionType breakType = isLongBreak 
-        ? PomodoroSession::SessionType::LONG_BREAK
-        : PomodoroSession::SessionType::SHORT_BREAK;
-    
-    int breakDuration = isLongBreak ? longBreakDuration : shortBreakDuration;
-    
-    currentSession = std::make_shared<PomodoroSession>(breakType, breakDuration);
-    currentSession->start();
-    sessions.push_back(currentSession);
+    current = std::make_shared<PomodoroSession>(PomodoroSession::SessionType::BREAK, 5);
+    current->start();
 }
 
-void PomodoroTracker::pauseCurrentSession() {
-    if (currentSession) {
-        currentSession->pause();
+void PomodoroTracker::finish() {
+    if (current && current->getType() == PomodoroSession::SessionType::WORK) {
+        count++;
     }
+    current = nullptr;
 }
-
-void PomodoroTracker::completeCurrentSession() {
-    if (currentSession) {
-        currentSession->complete();
-        
-        if (currentSession->getType() == PomodoroSession::SessionType::WORK) {
-            workSessionsCompleted++;
-            totalWorkMinutes += workDuration;
-        }
-        
-        currentSession = nullptr;
-    }
-}
-
-void PomodoroTracker::printStats() const {
-    std::cout << "\n--- Your Stats ---\n";
-    std::cout << "Sessions completed: " << workSessionsCompleted << "\n";
-    std::cout << "Total study time: " << totalWorkMinutes << " minutes\n";
-    std::cout << "------------------\n\n";
-}
-
-void PomodoroTracker::printCurrentSession() const {
-    if (!currentSession) {
-        std::cout << "No session running right now\n";
-        return;
-    }
-    
-    std::cout << "\nCurrent session:\n";
-    std::cout << "Time left: " << currentSession->getFormattedTimeRemaining() << "\n";
-    
-    if (!currentSession->getTaskName().empty()) {
-        std::cout << "Task: " << currentSession->getTaskName() << "\n";
-    }
-    std::cout << "\n";
-}
-

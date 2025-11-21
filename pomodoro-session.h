@@ -2,53 +2,34 @@
 #define POMODORO_SESSION_H
 
 #include <string>
-#include <chrono>
 
-// Session class for tracking pomodoro timers
 class PomodoroSession {
 public:
     enum class SessionType {
         WORK,
-        SHORT_BREAK,
-        LONG_BREAK
-    };
-
-    enum class SessionStatus {
-        NOT_STARTED,
-        IN_PROGRESS,
-        PAUSED,
-        COMPLETED,
-        CANCELLED
+        BREAK
     };
 
 private:
     SessionType type;
-    SessionStatus status;
-    int durationMinutes;
-    int remainingSeconds;
-    std::string taskName;
-    std::chrono::system_clock::time_point startTime;
-    std::chrono::system_clock::time_point endTime;
+    int timeLeft;
+    std::string task;
+    bool running;
 
 public:
-    PomodoroSession(SessionType type, int duration, const std::string& task = "");
+    PomodoroSession(SessionType t, int mins);
     
-    // getters
     SessionType getType() const { return type; }
-    SessionStatus getStatus() const { return status; }
-    int getRemainingSeconds() const { return remainingSeconds; }
-    std::string getTaskName() const { return taskName; }
+    int getTimeLeft() const { return timeLeft; }
+    std::string getTask() const { return task; }
+    bool isRunning() const { return running; }
     
-    void setTaskName(const std::string& task) { taskName = task; }
+    void setTask(const std::string& t) { task = t; }
+    void start() { running = true; }
+    void stop() { running = false; }
+    void tick();
     
-    void start();
-    void pause();
-    void complete();
-    void updateRemainingTime(int seconds);
-    
-    std::string getFormattedTimeRemaining() const;
-    bool isActive() const;
+    std::string formatTime() const;
 };
 
-#endif // POMODORO_SESSION_H
-
+#endif
